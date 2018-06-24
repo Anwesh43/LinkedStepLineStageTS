@@ -1,1 +1,2 @@
-*.js
+LinkedStepLineStage.js
+node_modules/*
