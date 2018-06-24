@@ -85,6 +85,7 @@ class SLNode {
 
     state : SLState = new SLState()
 
+    x : number = 0
     constructor(private i : number) {
         this.addNeighbor()
 
@@ -97,28 +98,27 @@ class SLNode {
         }
     }
 
-    draw(context : CanvasRenderingContext2D, x : number) {
+    draw(context : CanvasRenderingContext2D) {
         const hGap : number = (2 * h / 3) / SL_NODES
         const xGap : number = (w / 2) / SL_NODES
         context.strokeStyle = '#673AB7'
         context.lineCap = 'round'
         context.lineWidth = Math.min(w, h) / 50
-        var origX : number = x
-        if (origX == -1) {
-            origX = (this.i) * xGap + xGap * this.state.scale
-        }
+        var ox : number = 0
         if (this.prev) {
-            this.prev.draw(context, -1)
+            ox = this.prev.x
+            this.prev.draw(context)
         }
-        if (this.next && x != -1) {
-            this.next.draw(context, origX)
-        }
+        this.x = ox + this.state.scale
         context.save()
-        context.translate(origX, h - this.i * hGap)
+        context.translate(this.x, h - this.i * hGap)
         context.moveTo(0, 0)
         context.lineTo(0, -hGap)
         context.stroke()
         context.restore()
+        if (this.state.scale < 1) {
+            this.next.draw(context)
+        }
     }
 
     update(stopcb : Function) {
@@ -140,4 +140,29 @@ class SLNode {
         cb()
         return this
     }
+}
+
+class LinkedStepLine {
+
+    curr : SLNode = new SLNode(0)
+
+    dir : number = 1
+
+    draw(context : CanvasRenderingContext2D) {
+        this.curr.draw(context)
+    }
+
+    update(stopcb : Function) {
+        this.curr.update(() => {
+            this.curr = this.curr.getNeighbor(this.dir, () => {
+                this.dir *= -1
+            })
+            stopcb()
+        })
+    }
+
+    startUpdating(startcb : Function) {
+        this.curr.startUpdating(startcb)
+    }
+
 }
