@@ -39,6 +39,12 @@ class LinkedStepLineStage {
             })
         }
     }
+
+    static init() {
+        const stage : LinkedStepLineStage = new LinkedStepLineStage()
+        stage.render()
+        stage.handleTap()
+    }
 }
 
 class SLState {
