@@ -113,6 +113,7 @@ class SLNode {
         if (this.i < SL_NODES - 1) {
             this.next = new SLNode(this.i + 1)
             this.next.prev = this
+            console.log(this.i)
         }
     }
 
@@ -125,16 +126,18 @@ class SLNode {
         var ox : number = 0
         if (this.prev) {
             ox = this.prev.x
+            if (this.state.scale > 0)
             this.prev.draw(context)
         }
-        this.x = ox + this.state.scale
+        this.x = ox + this.state.scale * xGap
         context.save()
         context.translate(this.x, h - this.i * hGap)
+        context.beginPath()
         context.moveTo(0, 0)
         context.lineTo(0, -hGap)
         context.stroke()
         context.restore()
-        if (this.state.scale < 1) {
+        if ((this.state.scale < 1) && this.next ) {
             this.next.draw(context)
         }
     }
