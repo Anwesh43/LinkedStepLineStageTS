@@ -27,5 +27,30 @@ class LinkedStepLineStage {
 
         }
     }
+}
 
+class SLState {
+
+    scale : number = 0
+
+    dir : number = 0
+
+    prevScale : number = 0
+
+    update(stopcb : Function) {
+        this.scale += this.dir * 0.1
+        if (Math.abs(this.scale - this.prevScale) > 1) {
+            this.scale = this.prevScale + this.dir
+            this.dir = 0
+            this.prevScale = this.scale
+            stopcb()
+        }
+    }
+
+    startUpdating(startcb : Function) {
+        if (this.dir == 0) {
+            this.dir = 1 - 2 * this.prevScale
+            startcb()
+        }
+    }
 }
