@@ -6,6 +6,10 @@ class LinkedStepLineStage {
 
     context : CanvasRenderingContext2D
 
+    private sl : LinkedStepLine = new LinkedStepLine()
+
+    private animator : SLAnimator = new SLAnimator()
+
     constructor() {
         this.initCanvas()
     }
@@ -20,11 +24,19 @@ class LinkedStepLineStage {
     render() {
         this.context.fillStyle = '#212121'
         this.context.fillRect(0, 0, w, h)
+        this.sl.draw(this.context)
     }
 
     handleTap() {
         this.canvas.onmousedown = () => {
-
+            this.sl.startUpdating(() => {
+                this.animator.start(() => {
+                    this.render()
+                    this.sl.update(() => {
+                        this.animator.stop()
+                    })
+                })
+            })
         }
     }
 }
@@ -164,5 +176,4 @@ class LinkedStepLine {
     startUpdating(startcb : Function) {
         this.curr.startUpdating(startcb)
     }
-
 }
