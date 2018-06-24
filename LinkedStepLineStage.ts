@@ -76,3 +76,68 @@ class SLAnimator {
         }
     }
 }
+
+class SLNode {
+
+    next : SLNode
+
+    prev : SLNode
+
+    state : SLState = new SLState()
+
+    constructor(private i : number) {
+        this.addNeighbor()
+
+    }
+
+    addNeighbor() {
+        if (this.i < SL_NODES - 1) {
+            this.next = new SLNode(this.i + 1)
+            this.next.prev = this
+        }
+    }
+
+    draw(context : CanvasRenderingContext2D, x : number) {
+        const hGap : number = (2 * h / 3) / SL_NODES
+        const xGap : number = (w / 2) / SL_NODES
+        context.strokeStyle = '#673AB7'
+        context.lineCap = 'round'
+        context.lineWidth = Math.min(w, h) / 50
+        var origX : number = x
+        if (origX == -1) {
+            origX = (this.i) * xGap + xGap * this.state.scale
+        }
+        if (this.prev) {
+            this.prev.draw(context, -1)
+        }
+        if (this.next && x != -1) {
+            this.next.draw(context, origX)
+        }
+        context.save()
+        context.translate(origX, h - this.i * hGap)
+        context.moveTo(0, 0)
+        context.lineTo(0, -hGap)
+        context.stroke()
+        context.restore()
+    }
+
+    update(stopcb : Function) {
+        this.state.update(stopcb)
+    }
+
+    startUpdating(startcb : Function) {
+        this.state.startUpdating(startcb)
+    }
+
+    getNeighbor(dir : number, cb : Function) {
+        var curr : SLNode = this.prev
+        if (dir == 1) {
+            curr = this.next
+        }
+        if (curr) {
+            return curr
+        }
+        cb()
+        return this
+    }
+}
